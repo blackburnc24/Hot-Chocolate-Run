@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Hot Chocolate Run</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.css" />
+    <link href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Lora" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+ 
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: "whitesmoke";
+            font-family: "Noto Sans", sans-serif;
+            color: #3d3d3d;
+        }
+
+        h1 {
+            position: absolute;
+            margin-top: 0;
+            top: 10px;
+            left: 45px;
+            font-size: 2em;
+            font-family: "Lora", serif;
+            letter-spacing: .04em;
+            padding: 10px 15px;
+            background: rgba(256, 256, 256);
+            border: 1px solid grey;
+            border-radius: 3px;
+            z-index: 800;
+        }
+
+        h2 {
+            font-family: "Lora", serif;
+            letter-spacing: .04em;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        section {
+            position: absolute;
+            bottom: 0;
+            left: 10px;
+            width: 280px;
+            margin: 20px auto;
+            padding: 0 15px;
+            background: rgba(256, 256, 256);
+            border: 1px solid grey;
+            border-radius: 3px;
+            z-index: 800;
+        }
+
+        p {
+            font-size: .9em;
+            line-height: 1.5em;
+        }
+
+        a {
+            color: #005daa;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Make sure the icon container has no extra padding or background */
+        .leaflet-marker-icon {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+        }
+        
+    </style>
+</head>
+
+<body>
+
+    <h1>Hot Chocolate Run Charlotte 2025</h1>
+
+    <div id='map'></div>
+
+    <section>
+        <h2>Hot Chocolate Run</h2>
+
+        <p>On February 15, 2025, Charlotte hosted a Hot Chocolate Run. There was over a thousand runners.</p>
+
+        <p>Individuals could choose to run either a 5-kilometer, 10km, or 15km race. I choose to run the 10k race, which is what this route is showing.
+        </p>
+
+		<p><a href="https://hotchocolate15k.com/city/charlotte/" target="_blank">Visit the Hot Chocolate Run Charlotte Website</a></p>
+        <p>Map authored by Caleb Blackburn</p>
+    </section>
+
+    <script src="http://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="/data/route.js"></script>
+
+    <script>
+
+        // Options to be used when creating the map
+        var options = {
+            center: [35.231761, -80.820943],
+            zoom: 15
+        }
+
+        // Creation of the Leaflet map
+        var map = L.map('map', options);
+
+        // Request to load basemap
+        var CartoDB_Positron = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+            subdomains: 'abcd'
+        }).addTo(map);
+
+        // Example GeoJSON data for route
+        var myRoute = L.geoJson(data, {
+            style: function (feature) {
+                return {
+                    color: "brown",
+                    weight: 6,
+                    opacity: 0.8,
+					dashArray: "12, 6"
+                };
+            },
+            pointToLayer: function (feature, latlng) {
+                if (feature.geometry.type === "Point") {
+                    // Using a custom icon for the marker
+                    var flagIcon = L.divIcon({
+                        className: 'fa-flag',  // FontAwesome flag class
+                        iconSize: [30, 30],  // Adjust size
+                        html: '<i class="fas fa-flag" style="color:blue; font-size: 20px;"></i>',  // Set HTML to display FontAwesome icon
+                        iconAnchor: [15, 30],  // Anchor the icon to the bottom center
+                        popupAnchor: [0, -30]  // Set popup to appear above the flag
+                    });
+
+                    // Creating the marker with the custom flag icon
+                    var marker = L.marker(latlng, { icon: flagIcon });
+
+                    return marker;
+                }
+            },
+            onEachFeature: function (feature, layer) {
+    if (feature.properties && feature.properties.name) {
+        let popupContent = `<h3>${feature.properties.name}</h3>`;
+
+        // Check for specific locations and assign images + descriptions
+        if (feature.properties.name === "Start of Race") {
+            popupContent += `
+                <img src="/data/Start.jpg" width="300px" style="display:block; margin-top:10px;" />
+                <p style="margin-top:10px;">This was the starting point of the race. There was a lot of people lined up, ready to go. Image Credit: https://www.youtube.com/watch?v=0mn8mPtRd7c </p>
+            `;
+        } else if (feature.properties.name === "Bridge over Highways") {
+            popupContent += `
+                <img src="/data/Bridge.jpg" width="200px" style="display:block; margin-top:10px;" />
+                <p style="margin-top:10px;">I took this picture on my phone during the final push of the race.</p>
+            `;
+        }
+
+        layer.bindPopup(popupContent);
+    }
+}
+
+        }).addTo(map);
+
+    </script>
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+    
